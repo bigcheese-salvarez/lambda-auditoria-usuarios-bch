@@ -1,0 +1,15 @@
+service: ses-sendemail-sso-listado-usuarios-bch
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  stage: prod
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: ${self:provider.environment.S3_BUCKET}
+functions:
+  sso-reporte-usuarios-bch:
+    handler: ses_send_email_sso.main
