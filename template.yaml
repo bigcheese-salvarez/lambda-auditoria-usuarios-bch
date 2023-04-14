@@ -25,5 +25,5 @@ Resources:
         - S3FullAccessPolicy:
             BucketName: test-bucket-serverless # bucket name without arn
         - SESCrudPolicy:
-          IdentityName: salvarez@bigcheese.com.uy
+            IdentityName: salvarez@bigcheese.com.uy
 
