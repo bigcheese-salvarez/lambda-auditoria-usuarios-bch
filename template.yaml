@@ -24,6 +24,12 @@ Resources:
       Policies:
         - S3FullAccessPolicy:
             BucketName: test-bucket-serverless # bucket name without arn
-        - SESCrudPolicy:
-            IdentityName: salvarez@bigcheese.com.uy
-
+        #- SESCrudPolicy:
+        #    IdentityName: salvarez@bigcheese.com.uy
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ses:SendEmail'
+                - 'ses:SendRawEmail'
+              Resource: '*'
