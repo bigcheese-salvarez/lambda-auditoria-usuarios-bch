@@ -20,7 +20,7 @@ Resources:
       Runtime: python3.8
       Architectures:
         - x86_64
-      # Include the IAM role statement below
+      # Include the IAM role statement below.
       Policies:
         - MyCustomPolicy
       
