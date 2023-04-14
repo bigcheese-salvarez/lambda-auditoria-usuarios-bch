@@ -14,6 +14,7 @@ def lambda_handler(event, context):
         SUBJECT = "Email desde S3"
         FILEOBJ = event["Records"][0]
         BUCKET_NAME = str(FILEOBJ['s3']['bucket']['name'])
+        print(BUCKET_NAME)
         KEY = str(FILEOBJ['s3']['object']['key'])
         FILE_NAME = os.path.basename(KEY)
         TMP_FILE_NAME = '/tmp/' + FILE_NAME

@@ -22,6 +22,18 @@ Resources:
         - x86_64
       # Include the IAM role statement below
       Policies:
-        - S3FullAccessPolicy:
-            BucketName: tst-auditoria-usuarios-serverless-artifacts
+        - MyCustomPolicy
+      
+  MyCustomPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: MyCustomPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:*
+            Resource:
+              - 'arn:aws:s3:::tst-auditoria-usuarios-serverless-artifacts/*'
 
