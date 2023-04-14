@@ -20,4 +20,14 @@ Resources:
       Runtime: python3.8
       Architectures:
         - x86_64
+      # Include the IAM role statement below
+      Policies:
+        - S3BucketPolicy:
+            BucketName: !Ref S3Bucket
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action: s3:*
+                  Resource: !Sub arn:aws:s3:::tst-auditoria-usuarios-serverless-artifacts/*
 
