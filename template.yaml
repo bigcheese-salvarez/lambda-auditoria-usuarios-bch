@@ -26,5 +26,5 @@ Resources:
           Effect: Allow
           Action:
           - s3:*
-          Resource: arn:aws:s3:::tst-auditoria-usuarios-serverless-artifacts/*'
+          Resource: arn:aws:s3:::test-bucket-serverless/*'
 
