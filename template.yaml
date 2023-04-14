@@ -22,9 +22,6 @@ Resources:
         - x86_64
       # Include the IAM role statement below.
       Policies:
-      - Statement:
-          Effect: Allow
-          Action:
-          - s3:*
-          Resource: arn:aws:s3:::test-bucket-serverless/*'
+        - S3FullAccessPolicy:
+            BucketName: test-bucket-serverless # bucket name without arn
 
