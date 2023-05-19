@@ -12,6 +12,12 @@ Globals:
     MemorySize: 128
 
 Resources:
+#Se crea un bucket que sirve como disparador de la Lambda
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: test-bucket-serverless-v1
+#Se crea una funcion lambda que envia un correo via SES una vez que se introduce una archivo al S3 declarado anteriormenete
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -20,12 +26,10 @@ Resources:
       Runtime: python3.8
       Architectures:
         - x86_64
-      # Include the IAM role statement below.
+      # Se incluyen los permisos de FullAccess S3, FullAccessDynamoDB, etc.
       Policies:
         - S3FullAccessPolicy:
-            BucketName: test-bucket-serverless # bucket name without arn
-        #- SESCrudPolicy:
-        #    IdentityName: salvarez@bigcheese.com.uy
+            BucketName: test-bucket-serverless-v1 # bucket name without arn
         - Version: '2012-10-17' # Policy Document
           Statement:
             - Effect: Allow
@@ -33,3 +37,126 @@ Resources:
                 - 'ses:SendEmail'
                 - 'ses:SendRawEmail'
               Resource: '*'
+            - Effect: Allow
+              Action: logs:CreateLogGroup
+              Resource: arn:aws:logs:us-east-1:088157068258:*
+            - Effect: Allow
+              Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              Resource:
+              - arn:aws:logs:us-east-1:088157068258:log-group:/aws/lambda/dynamo_report_sso:*
+            - Effect: Allow
+              Action: cloudtrail:LookupEvents
+              Resource: "*"
+            - Effect: Allow
+              Action:
+              - s3:PutObject
+              - s3:GetObject
+              Resource:
+              - arn:aws:s3:::sso-list-lambda
+              - arn:aws:s3:::sso-list-lambda/*
+            - Effect: Allow
+              Action:
+              - dynamodb:*
+              - dax:*
+              - application-autoscaling:DeleteScalingPolicy
+              - application-autoscaling:DeregisterScalableTarget
+              - application-autoscaling:DescribeScalableTargets
+              - application-autoscaling:DescribeScalingActivities
+              - application-autoscaling:DescribeScalingPolicies
+              - application-autoscaling:PutScalingPolicy
+              - application-autoscaling:RegisterScalableTarget
+              - cloudwatch:DeleteAlarms
+              - cloudwatch:DescribeAlarmHistory
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DescribeAlarmsForMetric
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:ListMetrics
+              - cloudwatch:PutMetricAlarm
+              - cloudwatch:GetMetricData
+              - datapipeline:ActivatePipeline
+              - datapipeline:CreatePipeline
+              - datapipeline:DeletePipeline
+              - datapipeline:DescribeObjects
+              - datapipeline:DescribePipelines
+              - datapipeline:GetPipelineDefinition
+              - datapipeline:ListPipelines
+              - datapipeline:PutPipelineDefinition
+              - datapipeline:QueryObjects
+              - ec2:DescribeVpcs
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+              - iam:GetRole
+              - iam:ListRoles
+              - kms:DescribeKey
+              - kms:ListAliases
+              - sns:CreateTopic
+              - sns:DeleteTopic
+              - sns:ListSubscriptions
+              - sns:ListSubscriptionsByTopic
+              - sns:ListTopics
+              - sns:Subscribe
+              - sns:Unsubscribe
+              - sns:SetTopicAttributes
+              - lambda:CreateFunction
+              - lambda:ListFunctions
+              - lambda:ListEventSourceMappings
+              - lambda:CreateEventSourceMapping
+              - lambda:DeleteEventSourceMapping
+              - lambda:GetFunctionConfiguration
+              - lambda:DeleteFunction
+              - resource-groups:ListGroups
+              - resource-groups:ListGroupResources
+              - resource-groups:GetGroup
+              - resource-groups:GetGroupQuery
+              - resource-groups:DeleteGroup
+              - resource-groups:CreateGroup
+              - tag:GetResources
+              - kinesis:ListStreams
+              - kinesis:DescribeStream
+              - kinesis:DescribeStreamSummary
+              Resource: "*"
+            - Action: cloudwatch:GetInsightRuleReport
+              Effect: Allow
+              Resource: arn:aws:cloudwatch:*:*:insight-rule/DynamoDBContributorInsights*
+            - Action:
+              - iam:PassRole
+              Effect: Allow
+              Resource: "*"
+              Condition:
+                StringLike:
+                  iam:PassedToService:
+                  - application-autoscaling.amazonaws.com
+                  - application-autoscaling.amazonaws.com.cn
+                  - dax.amazonaws.com
+            - Effect: Allow
+              Action:
+              - iam:CreateServiceLinkedRole
+              Resource: "*"
+              Condition:
+                StringEquals:
+                  iam:AWSServiceName:
+                  - replication.dynamodb.amazonaws.com
+                  - dax.amazonaws.com
+                  - dynamodb.application-autoscaling.amazonaws.com
+                  - contributorinsights.dynamodb.amazonaws.com
+                  - kinesisreplication.dynamodb.amazonaws.com
+# Se crea una Dynamo para guardar datos genericos a traves de la lambda en caso que sean necesarios
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: userid
+          AttributeType: S
+        - AttributeName: accountid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userid
+          KeyType: HASH
+        - AttributeName: accountid
+          KeyType: RANGE
+      TableName: Dynamo-table
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1

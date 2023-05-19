@@ -1,15 +1,22 @@
 import os.path
 import boto3
 import email
+import json
+from datetime import datetime
+import time
+from datetime import date
 from botocore.exceptions import ClientError
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
+date = time.today("%m/%d/%Y", ts)
+account = ("BigCheese")
+userid = ("Martin")
 s3 = boto3.client("s3")
 def lambda_handler(event, context):
-    RECIPIENTS = ["salvarez@bigcheese.com.uy"]
+    RECIPIENTS = ["mmarini@bigcheese.com.uy"]
     for RECIPIENT in RECIPIENTS:
-        SENDER = "salvarez@bigcheese.com.uy"
+        SENDER = "mmarini@bigcheese.com.uy"
         AWS_REGION = "us-east-1"
         SUBJECT = "Email desde S3"
         FILEOBJ = event["Records"][0]
@@ -43,3 +50,9 @@ def lambda_handler(event, context):
             print(e.response['Error']['Message'])
         else:
             print("Email sent! Message ID:",response['MessageId'])
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table('Dynamo-table')
+
+    response=table.put_item(Item={"userid":userid,"accountid":account,"lastsso":date})
+       
+    return response
