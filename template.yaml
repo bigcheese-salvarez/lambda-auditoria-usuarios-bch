@@ -142,7 +142,7 @@ Resources:
                   - dynamodb.application-autoscaling.amazonaws.com
                   - contributorinsights.dynamodb.amazonaws.com
                   - kinesisreplication.dynamodb.amazonaws.com
-# Se crea una Dynamo para guardar datos genericos a traves de la lambda en caso que sean necesarios
+# Se crea una Dynamo para guardar datos genericos a traves de la lambda en caso que sean necesarioss
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
